@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Nexus Inventor Lab</title>
+
+<style>
+/* Layout: app nativa de una columna. Paleta tomada del logo de Nexus (azul marino, cian del hexágono, naranja del engrane); motivo gráfico: bloques de App Inventor y hexágonos. */
+:root {
+  color-scheme: light;
+  --page: #E8EDF1;
+  --bg: #F3F6F8;
+  --cell: #FFFFFF;
+  --ink: #0F2C47;
+  --sub: #5F7183;
+  --faint: #8C9AA8;
+  --sep: rgba(15, 44, 71, .14);
+  --navy: #0B3050;
+  --cyan: #12B0DD;
+  --cyan-tint: #E3F5FB;
+  --orange: #EE7A22;
+  --orange-deep: #DB6A16;
+  --orange-tint: #FDEEDF;
+  --ok: #2E9A68;
+  --block-event: #D9A43A;
+  --block-call: #7D62B3;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+body {
+  margin: 0;
+  background: var(--page); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 28px; -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 400px; margin: 0 auto; display: grid; gap: 10px; }
+.notice { font-size: 13px; color: var(--sub); margin: 0 2px; }
+.phone { background: var(--bg); border-radius: 34px; border: 8px solid var(--navy); overflow: clip; min-height: 760px; display: flex; flex-direction: column; }
+@media (max-width: 440px) { .phone { border-width: 0; border-radius: 14px; min-height: 0; } }
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.i.sm { width: 16px; height: 16px; }
+
+.nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 48px; padding: 0 8px; background: var(--bg); border-bottom: .5px solid var(--sep); position: sticky; top: 0; z-index: 3; }
+.nav.clean { border-bottom-color: transparent; }
+.nav .title { font-weight: 600; font-size: 16px; }
+.nav button { border: 0; background: none; font: inherit; color: var(--orange-deep); cursor: pointer; padding: 8px 6px; justify-self: start; display: flex; align-items: center; gap: 2px; }
+.nav .right { justify-self: end; padding-right: 8px; display: flex; gap: 14px; color: var(--sub); }
+.brandmark { display: flex; align-items: center; gap: 8px; padding-left: 8px; font-weight: 700; font-size: 15px; letter-spacing: .02em; }
+.brandmark img { width: 30px; height: auto; }
+main { flex: 1; padding: 4px 0 18px; }
+.pad { padding: 0 16px; }
+.big { font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0; }
+h1 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; margin: 0; line-height: 1.2; }
+p { margin: 0; }
+.sub { color: var(--sub); }
+.small { font-size: 13px; }
+.sectionhead { font-size: 13px; color: var(--sub); padding: 22px 32px 7px; display: flex; align-items: center; gap: 6px; }
+.group { background: var(--cell); border-radius: 14px; margin: 0 16px; overflow: hidden; }
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 11px 14px; position: relative; width: 100%; background: none; border: 0; font: inherit; color: inherit; text-align: left; }
+.row + .row::before { content: ""; position: absolute; top: 0; right: 0; left: 14px; border-top: .5px solid var(--sep); }
+.row.tap { cursor: pointer; }
+.row.tap:active { background: #EAF0F4; }
+.row .t { font-size: 15.5px; font-weight: 500; display: block; }
+.row .d { font-size: 13px; color: var(--sub); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 3px 10px; align-items: center; }
+.row .d span { display: inline-flex; align-items: center; gap: 4px; }
+.row .r { font-size: 12.5px; color: var(--faint); text-align: right; white-space: nowrap; display: flex; align-items: center; gap: 2px; }
+.thumb { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex: none; }
+.thumb svg { width: 100%; height: 100%; display: block; }
+.seats { display: block; height: 4px; width: 64px; border-radius: 4px; background: #E4EAEF; overflow: hidden; margin-top: 6px; }
+.seats i { display: block; height: 100%; background: var(--orange); border-radius: 4px; }
+
+.hero { margin: 12px 16px 0; border-radius: 18px; overflow: hidden; background: var(--navy); color: #fff; position: relative; }
+.hero svg.art { display: block; width: 100%; height: auto; }
+.hero .copy { padding: 0 16px 16px; display: grid; gap: 6px; margin-top: -6px; }
+.hero .copy b { font-size: 19px; line-height: 1.25; max-width: 24ch; text-wrap: balance; }
+.hero .copy span { font-size: 12.5px; opacity: .85; display: flex; gap: 10px; flex-wrap: wrap; }
+.hero .copy span span { display: inline-flex; align-items: center; gap: 4px; }
+
+.segc { display: flex; background: #E1E7EC; border-radius: 10px; padding: 2px; margin: 14px 16px 0; }
+.segc button { flex: 1; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; padding: 6px 4px; border-radius: 8px; cursor: pointer; color: var(--ink); display: inline-flex; justify-content: center; align-items: center; gap: 5px; }
+.segc button[aria-pressed="true"] { background: var(--cell); box-shadow: 0 1px 3px rgba(11,48,80,.15); font-weight: 600; }
+.foot { padding: 10px 32px 0; font-size: 13px; color: var(--sub); }
+.link { border: 0; background: none; font: inherit; color: var(--orange-deep); cursor: pointer; padding: 0; font-weight: 500; }
+.companycta { margin: 18px 16px 0; display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; background: var(--cell); border-radius: 14px; padding: 12px 14px; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; width: calc(100% - 32px); }
+
+.detailart { margin: 6px 16px 0; border-radius: 18px; overflow: hidden; }
+.detailart svg { display: block; width: 100%; height: auto; }
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 14px 16px 0; }
+.fact { background: var(--cell); border-radius: 12px; padding: 9px 6px; display: grid; justify-items: center; gap: 4px; text-align: center; font-size: 11.5px; color: var(--sub); }
+.fact svg { color: var(--cyan); }
+.fact b { color: var(--ink); font-size: 13px; font-weight: 600; }
+.block { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 0 16px; margin-top: 18px; }
+.block .ic { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; color: var(--navy); background: var(--cyan-tint); }
+.block h2 { font-size: 16.5px; font-weight: 600; margin: 3px 0 4px; }
+.block ul { margin: 2px 0 0; padding: 0; display: grid; gap: 5px; }
+.block li { list-style: none; display: grid; grid-template-columns: 18px 1fr; gap: 6px; }
+.block li svg { color: var(--ok); margin-top: 2px; }
+.mentorcard { margin: 18px 16px 0; background: var(--cell); border-radius: 16px; padding: 14px; display: grid; gap: 10px; position: relative; }
+.mentorcard .q { font-size: 15.5px; line-height: 1.45; }
+.mentorcard .qmark { position: absolute; right: 14px; top: 6px; font-size: 54px; line-height: 1; color: var(--orange-tint); font-family: Georgia, serif; }
+.who { display: flex; align-items: center; gap: 10px; }
+.face { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; flex: none; overflow: hidden; }
+.face svg { width: 100%; height: 100%; }
+.wkchip { width: 46px; height: 30px; flex: none; }
+.rubbar { display: block; height: 6px; border-radius: 6px; background: #E4EAEF; margin-top: 6px; overflow: hidden; }
+.rubbar i { display: block; height: 100%; background: var(--cyan); border-radius: 6px; }
+.pct { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14.5px; line-height: 1.4; }
+.deliver { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 16px; }
+.deliver div { background: var(--cell); border-radius: 12px; padding: 12px 8px; display: grid; justify-items: center; gap: 6px; text-align: center; font-size: 12px; color: var(--sub); }
+.deliver svg { color: var(--orange-deep); width: 24px; height: 24px; }
+.deliver b { font-size: 13px; color: var(--ink); }
+
+.bottom { position: sticky; bottom: 0; background: rgba(243,246,248,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: .5px solid var(--sep); padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; z-index: 3; }
+.bottom .info { font-size: 13px; color: var(--sub); display: flex; justify-content: center; align-items: center; gap: 6px; }
+.btn { appearance: none; border: 0; border-radius: 13px; padding: 14px; font: inherit; font-weight: 600; font-size: 16px; background: var(--orange); color: #fff; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.btn:hover { background: var(--orange-deep); }
+.btn.plain { background: none; color: var(--orange-deep); padding: 8px; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+h1:focus, .big:focus { outline: none; }
+
+.formart { margin: 8px 16px 0; display: flex; align-items: center; gap: 12px; background: var(--cell); border-radius: 14px; padding: 10px 12px; }
+.field { display: grid; grid-template-columns: 22px 78px 1fr; align-items: center; gap: 10px; }
+.field svg { color: var(--faint); }
+.field label { font-size: 15.5px; }
+.field input { border: 0; background: none; font: inherit; color: var(--ink); padding: 0; width: 100%; min-width: 0; outline: none; }
+.field input::placeholder { color: #A9B4BF; }
+.switchrow { grid-template-columns: 22px 1fr auto; }
+.switchrow .t { font-weight: 400; }
+.switchrow svg { color: var(--faint); }
+.switch { appearance: none; width: 51px; height: 31px; border-radius: 16px; background: #DCE3E9; position: relative; cursor: pointer; transition: background .2s; flex: none; margin: 0; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: transform .2s; }
+.switch:checked { background: var(--ok); }
+.switch:checked::after { transform: translateX(20px); }
+.err { color: #C0392B; font-size: 13px; padding: 8px 32px 0; }
+
+.doneart { margin: 6px auto 14px; width: 200px; }
+.doneart svg { display: block; width: 100%; height: auto; }
+.credential { margin: 16px 16px 0; background: var(--cell); border-radius: 16px; padding: 16px; display: grid; gap: 12px; position: relative; overflow: hidden; }
+.credential .hdr { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--sub); }
+.credential .hdr img { width: 34px; }
+.credential .name { font-size: 20px; font-weight: 700; }
+.credential dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0; font-size: 14px; }
+.credential dt { color: var(--sub); }
+.credential dd { margin: 0; }
+.credential .stamp { font-size: 12px; color: var(--faint); border-top: .5px dashed var(--sep); padding-top: 10px; display: flex; align-items: center; gap: 6px; }
+.credential .hexbg { position: absolute; right: -40px; top: -40px; width: 120px; opacity: .3; pointer-events: none; }
+.circle { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #C5CFD8; display: grid; place-items: center; color: #fff; }
+.circle.on { background: var(--ok); border-color: var(--ok); }
+.circle svg { width: 14px; height: 14px; stroke-width: 2.4; }
+.tag { font-size: 12px; color: var(--orange-deep); background: var(--orange-tint); padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
+
+.storeart { margin: 4px 16px 0; border-radius: 18px; overflow: hidden; }
+.storeart svg { display: block; width: 100%; height: auto; }
+.weeks8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; margin-top: 6px; }
+.weeks8 i { height: 5px; border-radius: 3px; background: #E4EAEF; }
+.weeks8 i.on { background: var(--cyan); }
+.weeks8.warn i.on { background: #E0A43A; }
+.summary { margin: 12px 16px 0; background: var(--cell); border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; font-size: 14.5px; }
+.ring { width: 56px; height: 56px; }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <p class="notice">Prototipo para la prueba con usuarios de Nexus Inventor Lab. Explóralo como si fueras a inscribirte (unos 5 minutos). Las empresas, fechas y cifras son de ejemplo y nada de lo que escribas se guarda.</p>
+  <div class="phone" id="app"></div>
+</div>
+
+<script>
+const ENCUESTA_URL = ""; // pegar aquí el enlace del Google Form
+const MARK = "data:image/webp;base64,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";
+
+/* ---------- íconos (trazo, 24x24) ---------- */
+const P = {
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  level: '<path d="M5 19v-4M12 19v-8M19 19V6"/>',
+  tag: '<path d="M3.5 12.5V4.5a1 1 0 0 1 1-1h8l8.5 8.5-9 9z"/><circle cx="8" cy="8" r="1.4"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  book: '<path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/>',
+  building: '<path d="M4 21V5.5L12 3v18M12 8h8v13M2 21h20M7.5 8h1.5M7.5 12h1.5M7.5 16h1.5M15.5 12h1.5M15.5 16h1.5"/>',
+  award: '<circle cx="12" cy="9" r="6"/><path d="M8.6 14 7 21l5-2.6 5 2.6-1.6-7"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  chevR: '<path d="M9 5l7 7-7 7"/>',
+  chevL: '<path d="M15 5l-7 7 7 7"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5 12 13l8.5-6.5"/>',
+  cap: '<path d="M2 9.5 12 4.5l10 5-10 5z"/><path d="M6 11.5v4.5c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5M22 9.5v5"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+  code: '<path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M10 12l-2 2 2 2M14 12l2 2-2 2"/>',
+  video: '<rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="M15.5 10.5 21 7v10l-5.5-3.5"/>',
+  present: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 21h8M7 12l3-3 2 2 4-4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/>',
+  puzzle: '<path d="M4 7h4.2a2.2 2.2 0 1 1 4.3 0H17v4.3a2.2 2.2 0 1 1 0 4.4V20H4z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+  sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+  box: '<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>',
+  msg: '<path d="M4 5h16v11H9l-5 4z"/>',
+  pill: '<rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-40 12 12)"/><path d="M9 9.3l5.7 5.4"/>'
+};
+const ic = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+
+/* ---------- ilustraciones ---------- */
+const C = { navy: "#0B3050", cyan: "#12B0DD", cyanT: "#E3F5FB", cyanM: "#9ADCF0", or: "#EE7A22", orT: "#FDEEDF", orM: "#F7C08F", ink2: "#24496B", paper: "#FFFFFF", grey: "#DCE4EA", box1: "#E9B98A", box2: "#F3D3AE", ev: "#D9A43A", call: "#7D62B3" };
+
+function hexPath(cx, cy, r) {
+  const pts = []; for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); pts.push((cx + r * Math.cos(a)).toFixed(1) + "," + (cy + r * Math.sin(a)).toFixed(1)); }
+  return "M" + pts.join("L") + "Z";
+}
+function honeycomb(x0, y0, cols, rows, r, stroke, op) {
+  let s = ""; const w = r * Math.sqrt(3);
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) s += `<path d="${hexPath(x0 + i * w + (j % 2) * w / 2, y0 + j * r * 1.5, r)}" fill="none" stroke="${stroke}" stroke-width="1.2" opacity="${op}"/>`;
+  return s;
+}
+function barcode(x, y, h, w) {
+  const pattern = [2,1,1,3,1,2,1,1,2,3,1,1,2,1,3,1,1,2]; let s = "", cx = x, unit = w / 40;
+  pattern.forEach((p, k) => { if (k % 2 === 0) s += `<rect x="${cx.toFixed(1)}" y="${y}" width="${(p * unit).toFixed(1)}" height="${h}" fill="${C.navy}"/>`; cx += p * unit; });
+  return s;
+}
+
+const ART = {
+  log: () => `<svg viewBox="0 0 340 170" role="img" aria-label="Celular leyendo el código de barras de una caja en un anaquel">
+    <rect width="340" height="170" fill="${C.cyanT}"/>
+    ${honeycomb(250, 10, 5, 3, 12, C.cyan, .25)}
+    <rect x="18" y="58" width="168" height="7" rx="2" fill="#B7C7D4"/><rect x="18" y="120" width="168" height="7" rx="2" fill="#B7C7D4"/>
+    <rect x="26" y="22" width="40" height="36" rx="3" fill="${C.box1}"/><rect x="70" y="32" width="34" height="26" rx="3" fill="${C.box2}"/><rect x="108" y="16" width="44" height="42" rx="3" fill="${C.box1}"/>
+    <path d="M108 30h44" stroke="#C99467" stroke-width="2"/>
+    <rect x="30" y="84" width="54" height="36" rx="3" fill="${C.box2}"/><rect x="88" y="78" width="40" height="42" rx="3" fill="${C.box1}"/><rect x="132" y="92" width="42" height="28" rx="3" fill="${C.box2}"/>
+    <rect x="94" y="94" width="28" height="18" rx="2" fill="#fff"/>${barcode(97, 97, 12, 22)}
+    <path d="M226 70 L120 92 L120 114 L226 92 Z" fill="${C.or}" opacity=".22"/>
+    <path d="M122 103 L226 81" stroke="${C.or}" stroke-width="2" stroke-dasharray="4 4"/>
+    <g transform="rotate(-8 262 96)">
+      <rect x="226" y="34" width="72" height="124" rx="13" fill="${C.navy}"/>
+      <rect x="232" y="44" width="60" height="104" rx="8" fill="#fff"/>
+      <rect x="240" y="56" width="44" height="26" rx="3" fill="${C.cyanT}"/>${barcode(244, 61, 16, 36)}
+      <circle cx="262" cy="104" r="13" fill="#2E9A68"/><path d="M255 104l5 5 9-10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="242" y="126" width="40" height="5" rx="2.5" fill="${C.grey}"/><rect x="248" y="135" width="28" height="5" rx="2.5" fill="${C.grey}"/>
+    </g>
+    <text x="300" y="70" font-family="-apple-system, Segoe UI, sans-serif" font-size="13" font-weight="700" fill="${C.or}">+1</text>
+  </svg>`,
+  ia: () => `<svg viewBox="0 0 340 170" role="img" aria-label="Mensajes que se clasifican en tres bandejas">
+    <rect width="340" height="170" fill="#EEF1F8"/>
+    ${honeycomb(-6, 120, 4, 3, 12, C.cyan, .2)}
+    ${[22, 62, 102].map((y, k) => `<g transform="translate(${18 + (k % 2) * 10} ${y})"><rect width="92" height="32" rx="9" fill="#fff"/><path d="M10 32 l-2 8 10-8" fill="#fff"/>
+      <rect x="10" y="9" width="${[60, 48, 66][k]}" height="5" rx="2.5" fill="${C.grey}"/><rect x="10" y="18" width="${[38, 56, 30][k]}" height="5" rx="2.5" fill="${C.grey}"/></g>`).join("")}
+    <path d="M128 85 H150" stroke="${C.ink2}" stroke-width="2" stroke-dasharray="3 4"/>
+    <path d="${hexPath(176, 85, 28)}" fill="${C.cyan}"/>
+    <path d="M164 78h8v-8M188 92h-8v8M164 92h6M182 78h6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle cx="172" cy="70" r="2.5" fill="#fff"/><circle cx="180" cy="100" r="2.5" fill="#fff"/><circle cx="162" cy="92" r="2.5" fill="#fff"/><circle cx="190" cy="78" r="2.5" fill="#fff"/>
+    ${[[34, C.or, "Pagos"], [78, C.cyan, "Envíos"], [122, C.call, "Quejas"]].map(([y, col, lab]) => `
+      <path d="M204 85 C 220 85, 220 ${y + 14}, 236 ${y + 14}" stroke="${C.ink2}" stroke-width="1.6" fill="none" opacity=".5"/>
+      <rect x="238" y="${y}" width="86" height="28" rx="7" fill="#fff"/><rect x="238" y="${y}" width="7" height="28" rx="3" fill="${col}"/>
+      <text x="253" y="${y + 18}" font-family="-apple-system, Segoe UI, sans-serif" font-size="12" font-weight="600" fill="${C.navy}">${lab}</text>`).join("")}
+  </svg>`,
+  ux: () => `<svg viewBox="0 0 340 170" role="img" aria-label="Celular con un botón grande para pedir medicamento y un aviso de listo">
+    <rect width="340" height="170" fill="${C.orT}"/>
+    ${honeycomb(240, 118, 5, 3, 12, C.or, .22)}
+    <rect x="44" y="18" width="82" height="146" rx="14" fill="${C.navy}"/>
+    <rect x="50" y="28" width="70" height="124" rx="9" fill="#fff"/>
+    <rect x="58" y="40" width="40" height="6" rx="3" fill="${C.grey}"/><rect x="58" y="51" width="54" height="6" rx="3" fill="${C.grey}"/>
+    <rect x="58" y="70" width="54" height="34" rx="9" fill="${C.or}"/>
+    <text x="85" y="92" text-anchor="middle" font-family="-apple-system, Segoe UI, sans-serif" font-size="13" font-weight="700" fill="#fff">Pedir</text>
+    <rect x="58" y="114" width="54" height="26" rx="7" fill="${C.cyanT}"/>
+    <text x="85" y="131" text-anchor="middle" font-family="-apple-system, Segoe UI, sans-serif" font-size="9.5" fill="${C.navy}">Mismo de siempre</text>
+    <g transform="translate(160 30)">
+      <rect width="150" height="44" rx="12" fill="#fff"/>
+      <circle cx="22" cy="22" r="12" fill="#2E9A68"/><path d="M16 22l4 4 8-9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="42" y="19" font-family="-apple-system, Segoe UI, sans-serif" font-size="11" font-weight="700" fill="${C.navy}">Tu pedido está listo</text>
+      <text x="42" y="33" font-family="-apple-system, Segoe UI, sans-serif" font-size="10" fill="#5F7183">Pasa a recogerlo hoy</text>
+    </g>
+    <path d="M150 52 h10" stroke="${C.navy}" stroke-width="1.5" stroke-dasharray="2 3"/>
+    <g transform="translate(206 86)">
+      <rect x="6" y="0" width="38" height="12" rx="3" fill="${C.or}"/>
+      <rect x="0" y="10" width="50" height="62" rx="8" fill="#fff"/>
+      <rect x="8" y="26" width="34" height="22" rx="3" fill="${C.cyanT}"/>
+      <path d="M25 31v12M19 37h12" stroke="${C.cyan}" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(266 92) rotate(-30)"><rect width="40" height="15" rx="7.5" fill="${C.orM}"/><rect width="20" height="15" rx="7.5" fill="${C.or}"/><rect x="12" width="8" height="15" fill="${C.or}"/></g>
+  </svg>`,
+  hero: () => `<svg class="art" viewBox="0 0 340 150" aria-hidden="true">
+    <rect width="340" height="150" fill="${C.navy}"/>
+    ${honeycomb(170, -4, 8, 6, 15, C.cyan, .18)}
+    <g transform="translate(128 22)">
+      <path d="M0 6a6 6 0 0 1 6-6h12l4 5h14l4-5h154a6 6 0 0 1 6 6v20H44v24h156v12a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6z" fill="${C.ev}"/>
+      <text x="10" y="18" font-family="-apple-system, Segoe UI, sans-serif" font-size="11" font-weight="600" fill="#fff">cuando Botón1.Clic</text>
+      <text x="8" y="42" font-family="-apple-system, Segoe UI, sans-serif" font-size="10" font-weight="600" fill="#fff">hacer</text>
+      <path d="M44 26h8l4 5h14l4-5h121a5 5 0 0 1 5 5v14a5 5 0 0 1-5 5H44z" fill="${C.call}"/>
+      <text x="54" y="42" font-family="-apple-system, Segoe UI, sans-serif" font-size="10" font-weight="600" fill="#fff">llamar Escáner1.Escanear</text>
+    </g>
+    <g transform="translate(200 100) rotate(5)">
+      <path d="M0 5a5 5 0 0 1 5-5h10l4 5h12l4-5h76a5 5 0 0 1 5 5v14a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5z" fill="${C.cyan}"/>
+      <text x="10" y="16" font-family="-apple-system, Segoe UI, sans-serif" font-size="10" font-weight="600" fill="#fff">guardar en la nube</text>
+    </g>
+    <g transform="translate(36 22)">
+      <rect width="66" height="118" rx="12" fill="#163E62"/>
+      <rect x="6" y="9" width="54" height="100" rx="7" fill="#fff"/>
+      <rect x="13" y="20" width="40" height="22" rx="3" fill="${C.cyanT}"/>${barcode(17, 24, 14, 32)}
+      <rect x="13" y="50" width="40" height="5" rx="2.5" fill="${C.grey}"/><rect x="13" y="59" width="28" height="5" rx="2.5" fill="${C.grey}"/>
+      <rect x="13" y="78" width="40" height="18" rx="5" fill="${C.or}"/>
+    </g>
+    <path d="M106 70 C 116 70, 112 40, 124 40" stroke="${C.cyanM}" stroke-width="1.6" fill="none" stroke-dasharray="3 4"/>
+  </svg>`,
+  medal: () => `<svg viewBox="0 0 220 150" aria-hidden="true">
+    ${honeycomb(4, 14, 9, 6, 13, C.cyan, .18)}
+    <path d="M92 70 76 140l18-10 10 18 6-60z" fill="${C.or}"/><path d="M128 70l16 70-18-10-10 18-6-60z" fill="${C.cyan}"/>
+    <path d="${hexPath(110, 62, 46)}" fill="${C.navy}"/>
+    <path d="${hexPath(110, 62, 36)}" fill="none" stroke="${C.cyan}" stroke-width="2" stroke-dasharray="3 4"/>
+    <path d="M94 62l11 11 21-23" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(166 26) rotate(18)"><rect width="22" height="12" rx="3" fill="${C.ev}"/></g>
+    <g transform="translate(28 30) rotate(-14)"><rect width="22" height="12" rx="3" fill="${C.call}"/></g>
+    <g transform="translate(178 96) rotate(-8)"><rect width="16" height="10" rx="3" fill="${C.or}"/></g>
+  </svg>`,
+  store: () => `<svg viewBox="0 0 340 120" aria-hidden="true">
+    <rect width="340" height="120" fill="${C.cyanT}"/>
+    ${honeycomb(250, 6, 5, 3, 12, C.cyan, .22)}
+    <rect x="40" y="44" width="170" height="76" fill="#fff"/>
+    ${[0,1,2,3,4,5,6,7].map(k => `<path d="M${36 + k * 22.25} 24h22.25v16a11.1 11.1 0 0 1-22.25 0z" fill="${k % 2 ? "#fff" : C.or}"/>`).join("")}
+    <rect x="36" y="18" width="178" height="8" rx="2" fill="${C.navy}"/>
+    <rect x="56" y="64" width="56" height="56" rx="2" fill="${C.cyanM}" opacity=".6"/><rect x="128" y="64" width="64" height="34" rx="2" fill="${C.cyanM}" opacity=".6"/>
+    <text x="125" y="58" text-anchor="middle" font-family="-apple-system, Segoe UI, sans-serif" font-size="9" font-weight="700" fill="${C.navy}" letter-spacing="1">ABARROTES DEL NORTE</text>
+    <g transform="translate(236 46)"><rect width="76" height="60" rx="10" fill="#fff"/>
+      <text x="10" y="20" font-family="-apple-system, Segoe UI, sans-serif" font-size="9" fill="#5F7183">Avance del grupo</text>
+      ${[0,1,2,3,4,5,6,7].map(k => `<rect x="${10 + k * 7.4}" y="30" width="5.4" height="18" rx="2" fill="${k < 4 ? C.cyan : C.grey}"/>`).join("")}
+    </g>
+  </svg>`
+};
+function face(seed, initials) {
+  const skins = ["#E9C2A0", "#C99A72", "#F1D2B6", "#B98462"], hair = ["#2E2A27", "#5B3A29", "#1F1C1A", "#7A4B2F"], shirt = [C.cyan, C.or, C.call, C.navy];
+  const s = skins[seed % 4], h = hair[(seed + 1) % 4], sh = shirt[seed % 4];
+  return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" fill="${seed % 2 ? C.cyanT : C.orT}"/>
+    <path d="M6 40c2-8 8-12 14-12s12 4 14 12z" fill="${sh}"/><circle cx="20" cy="18" r="8" fill="${s}"/>
+    <path d="M12 17c0-6 4-9 8-9s8 3 8 9c-2-3-5-4-8-4s-6 1-8 4z" fill="${h}"/></svg>`;
+}
+function weekChip(label) {
+  return `<svg class="wkchip" viewBox="0 0 46 30" aria-hidden="true"><path d="M0 5a5 5 0 0 1 5-5h6l3 4h8l3-4h16a5 5 0 0 1 5 5v20a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5z" fill="${C.cyan}"/>
+    <text x="23" y="20" text-anchor="middle" font-family="-apple-system, Segoe UI, sans-serif" font-size="11" font-weight="700" fill="#fff">${label}</text></svg>`;
+}
+const thumb = id => `<span class="thumb">${ART[id]().replace('viewBox="0 0 340 170"', 'viewBox="170 10 170 150" preserveAspectRatio="xMidYMid slice"')}</span>`;
+
+/* ---------- datos ---------- */
+const RETOS = [
+  { id: "log", area: "Logística", empresa: "Abarrotes del Norte",
+    titulo: "Registro rápido de entregas en tienda", nivel: "Principiante", lugares: 20, ocupados: 13, cierre: "15 nov",
+    problema: "En cada tienda, el encargado anota a mano lo que trae cada proveedor. Se le pasan productos, el inventario no cuadra y la fila en caja crece mientras tanto.",
+    construyes: "Una app que lee el código de barras con la cámara del celular y suma cada producto al inventario de la tienda.",
+    aprendes: ["Leer códigos de barras con la cámara", "Guardar datos en una base en línea", "Diseñar para alguien que tiene prisa"],
+    rubrica: [["Lee bien 5 tipos de producto", 40], ["Un encargado la usa sin ayuda", 35], ["Presentación final", 25]],
+    mentor: ["Laura Mendoza", "Jefa de operaciones de tienda", 0, "Quiero ver una app que un encargado use en su primer día sin que nadie le explique nada."] },
+  { id: "ia", area: "IA", empresa: "Servicios Cumbre",
+    titulo: "Ordenar las solicitudes de los clientes", nivel: "Intermedio", lugares: 15, ocupados: 11, cierre: "15 nov",
+    problema: "Al área de atención llegan cientos de mensajes al día. Hoy alguien los lee uno por uno solo para decidir a quién le toca contestar.",
+    construyes: "Una app que sugiere el tema de cada mensaje para que llegue directo a la persona correcta.",
+    aprendes: ["Qué es un modelo de clasificación", "Conectar tu app con un servicio en línea", "Medir si tu app acierta"],
+    rubrica: [["Acierta el tema en los casos de prueba", 40], ["El agente puede corregir la sugerencia", 30], ["Presentación final", 30]],
+    mentor: ["Diego Ramírez", "Analista de datos", 1, "No necesito que acierte siempre. Necesito que se equivoque de forma fácil de corregir."] },
+  { id: "ux", area: "UX", empresa: "Farmacias Sierra",
+    titulo: "Pedir el resurtido de medicamento sin filas", nivel: "Principiante", lugares: 20, ocupados: 6, cierre: "22 nov",
+    problema: "Muchos clientes mayores hacen fila cada mes solo para volver a pedir el mismo medicamento.",
+    construyes: "Una app sencilla para pedir el resurtido y recibir un aviso cuando esté listo para recoger.",
+    aprendes: ["Entrevistar a usuarios reales", "Diseñar con letra grande y botones claros", "Mandar avisos desde tu app"],
+    rubrica: [["Un adulto mayor pide en menos de 1 minuto", 40], ["Cumple reglas básicas de accesibilidad", 30], ["Presentación final", 30]],
+    mentor: ["Sofía García", "Diseñadora de producto", 2, "Mi mamá tiene 71 años. Si ella puede usar tu app, ya ganaste."] }
+];
+const SEMANAS = [["1", "Conoces a tu mentor y el reto. Instalas MIT App Inventor."], ["2–3", "Bloques, pantallas y componentes con mini-retos."], ["4–5", "Primera versión de tu app y una prueba con alguien real."], ["6–7", "Mejoras con los comentarios de tu mentor."], ["8", "Presentas tu app a la empresa."]];
+
+const S = { view: "home", filtro: "Todos", reto: null, nombre: "", equipo: false, mayor: true };
+const app = document.getElementById("app");
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function show(view) {
+  S.view = view; ({ home, detail, form, done, company })[view]();
+  const h = app.querySelector("h1, .big"); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); }
+  window.scrollTo({ top: 0 });
+}
+function nav(title, back, right = "") {
+  return `<div class="nav${title ? "" : " clean"}">${back ? `<button type="button" data-back="${back[0]}">${ic("chevL")} ${back[1]}</button>` : `<span class="brandmark"><img src="${MARK}" alt="">Nexus</span>`}
+    <span class="title">${title}</span><span class="right">${right}</span></div>`;
+}
+function wire() { app.querySelectorAll("[data-back]").forEach(b => b.onclick = () => show(b.dataset.back)); }
+
+function home() {
+  const list = RETOS.filter(r => S.filtro === "Todos" || r.area === S.filtro);
+  app.innerHTML = `${nav("", null, `${ic("search")}${ic("bell")}`)}
+  <main>
+    <div class="pad"><p class="big">Retos</p><p class="sub small">Cohorte de enero · inscripciones abiertas</p></div>
+    <div class="hero">${ART.hero()}
+      <div class="copy"><b>Crea una app que una empresa necesita</b>
+        <span><span>${ic("cal", "i sm")} 8 semanas</span><span>${ic("users", "i sm")} con mentor</span><span>${ic("tag", "i sm")} sin costo</span></span></div></div>
+    <div class="segc" role="group" aria-label="Filtrar por área">${[["Todos", "sparkle"], ["Logística", "box"], ["IA", "msg"], ["UX", "pill"]].map(([f, i]) =>
+      `<button type="button" data-f="${f}" aria-pressed="${S.filtro === f}">${ic(i, "i sm")}${f}</button>`).join("")}</div>
+    <p class="sectionhead">${ic("puzzle", "i sm")} ${list.length === 1 ? "1 reto abierto" : list.length + " retos abiertos"}</p>
+    <div class="group">${list.map(r => `
+      <button class="row tap" type="button" data-id="${r.id}">
+        ${thumb(r.id)}
+        <span><span class="t">${esc(r.titulo)}</span>
+          <span class="d"><span>${ic("building", "i sm")}${esc(r.empresa)}</span><span>${ic("level", "i sm")}${r.nivel}</span></span>
+          <span class="seats" title="Lugares ocupados"><i style="width:${r.ocupados / r.lugares * 100}%"></i></span></span>
+        <span class="r">${r.lugares - r.ocupados} lugares ${ic("chevR", "i sm")}</span>
+      </button>`).join("")}</div>
+    <button class="companycta" type="button" id="toCompany">
+      <span class="thumb" style="width:52px;height:52px">${ART.store().replace('viewBox="0 0 340 120"', 'viewBox="30 10 120 100" preserveAspectRatio="xMidYMid slice"')}</span>
+      <span><span style="font-weight:600;display:block">¿Representas a una empresa?</span><span class="small sub">Mira el panel del patrocinador</span></span>
+      ${ic("chevR", "i sm")}
+    </button>
+  </main>`;
+  app.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.filtro = b.dataset.f; home(); });
+  app.querySelectorAll("[data-id]").forEach(b => b.onclick = () => { S.reto = RETOS.find(r => r.id === b.dataset.id); show("detail"); });
+  document.getElementById("toCompany").onclick = () => show("company");
+}
+
+function detail() {
+  const r = S.reto, m = r.mentor;
+  app.innerHTML = `${nav("", ["home", "Retos"])}
+  <main>
+    <div class="detailart">${ART[r.id]()}</div>
+    <div class="pad" style="display:grid;gap:6px;margin-top:14px">
+      <p class="sub small" style="display:flex;gap:6px;align-items:center">${ic("building", "i sm")}${esc(r.empresa)} · ${r.area}</p>
+      <h1>${esc(r.titulo)}</h1>
+    </div>
+    <div class="facts">
+      <div class="fact">${ic("cal")}<b>8</b>semanas</div>
+      <div class="fact">${ic("clock")}<b>~4 h</b>por semana</div>
+      <div class="fact">${ic("level")}<b>${r.nivel}</b>nivel</div>
+      <div class="fact">${ic("tag")}<b>$0</b>para ti</div>
+    </div>
+    <div class="block"><span class="ic">${ic("target", "i sm")}</span><div><h2>El problema</h2><p>${esc(r.problema)}</p></div></div>
+    <div class="block"><span class="ic">${ic("phone", "i sm")}</span><div><h2>Qué vas a construir</h2><p>${esc(r.construyes)}</p></div></div>
+    <div class="block"><span class="ic">${ic("book", "i sm")}</span><div><h2>Lo que aprendes</h2><ul>${r.aprendes.map(a => `<li>${ic("check", "i sm")}<span>${esc(a)}</span></li>`).join("")}</ul></div></div>
+    <div class="mentorcard"><span class="qmark" aria-hidden="true">“</span>
+      <p class="small sub">Tu mentora o mentor</p>
+      <p class="q">${esc(m[3])}</p>
+      <div class="who"><span class="face">${face(m[2])}</span><span class="small"><b>${esc(m[0])}</b><br><span class="sub">${esc(m[1])}, ${esc(r.empresa)}</span></span></div>
+    </div>
+    <p class="sectionhead">${ic("cal", "i sm")} Semana a semana</p>
+    <div class="group">${SEMANAS.map(([w, t]) => `<div class="row" style="grid-template-columns:auto 1fr">${weekChip(w)}<span style="font-size:14.5px">${t}</span></div>`).join("")}</div>
+    <p class="sectionhead">${ic("award", "i sm")} Cómo te evalúa ${esc(r.empresa)}</p>
+    <div class="group">${r.rubrica.map(([t, p]) => `<div class="row" style="grid-template-columns:1fr auto;align-items:start"><span><span class="t" style="font-size:14.5px">${esc(t)}</span><span class="rubbar"><i style="width:${p}%"></i></span></span><span class="pct">${p}%</span></div>`).join("")}</div>
+    <p class="sectionhead">${ic("box", "i sm")} Lo que entregas</p>
+    <div class="deliver">
+      <div>${ic("code")}<b>Tu app</b>archivo .aia</div>
+      <div>${ic("video")}<b>Video demo</b>máx. 3 min</div>
+      <div>${ic("present")}<b>Demo Day</b>ante la empresa</div>
+    </div>
+    <p class="foot">Con 70% o más recibes la microcredencial de Nexus Inventor Lab.</p>
+  </main>
+  <div class="bottom"><p class="info">${ic("users", "i sm")} Quedan ${r.lugares - r.ocupados} de ${r.lugares} lugares · cierra el ${r.cierre}</p>
+    <button class="btn" type="button" id="go">Inscribirme</button></div>`;
+  wire(); document.getElementById("go").onclick = () => show("form");
+}
+
+function form() {
+  const r = S.reto;
+  app.innerHTML = `${nav("Inscripción", ["detail", "Reto"])}
+  <main>
+    <div class="formart">${thumb(r.id).replace('class="thumb"', 'class="thumb" style="width:48px;height:48px"')}<span><span style="font-weight:600;font-size:14.5px;display:block">${esc(r.titulo)}</span><span class="small sub">${esc(r.empresa)}</span></span></div>
+    <p class="sectionhead">Tus datos</p>
+    <div class="group">
+      <div class="row field">${ic("user")}<label for="f-n">Nombre</label><input id="f-n" type="text" autocomplete="off" placeholder="Ana López"></div>
+      <div class="row field">${ic("mail")}<label for="f-c">Correo</label><input id="f-c" type="email" autocomplete="off" placeholder="ana@correo.com"></div>
+      <div class="row field">${ic("cap")}<label for="f-e">Escuela</label><input id="f-e" type="text" autocomplete="off" placeholder="CBTIS 99, 3er semestre"></div>
+    </div>
+    <p class="sectionhead">Cómo participas</p>
+    <div class="group">
+      <label class="row switchrow" for="f-eq">${ic("users")}<span class="t">Con mi equipo</span><input id="f-eq" class="switch" type="checkbox" ${S.equipo ? "checked" : ""}></label>
+      <label class="row switchrow" for="f-m">${ic("shield")}<span class="t">Tengo 18 años o más</span><input id="f-m" class="switch" type="checkbox" ${S.mayor ? "checked" : ""}></label>
+      <div class="row field" id="tutorRow" ${S.mayor ? "hidden" : ""}>${ic("mail")}<label for="f-t">Tutor</label><input id="f-t" type="email" autocomplete="off" placeholder="correo de tu tutor"></div>
+    </div>
+    <p class="foot" id="hint"></p>
+    <p class="err" id="err" hidden></p>
+  </main>
+  <div class="bottom"><button class="btn" type="button" id="send">${ic("check")} Confirmar inscripción</button></div>`;
+  wire();
+  const upd = () => {
+    S.equipo = document.getElementById("f-eq").checked; S.mayor = document.getElementById("f-m").checked;
+    document.getElementById("tutorRow").hidden = S.mayor;
+    document.getElementById("hint").textContent = (S.equipo ? "Hasta 3 personas. Después te llega un enlace para invitarlas. " : "") + (S.mayor ? "" : "Le mandamos un correo a tu tutor para que dé su permiso.");
+  };
+  upd();
+  document.getElementById("f-eq").onchange = upd; document.getElementById("f-m").onchange = upd;
+  document.getElementById("send").onclick = () => {
+    const v = id => document.getElementById(id).value.trim(), miss = [];
+    if (!v("f-n")) miss.push("tu nombre");
+    if (!v("f-c").includes("@")) miss.push("un correo válido");
+    if (!v("f-e")) miss.push("tu escuela");
+    if (!S.mayor && !v("f-t").includes("@")) miss.push("el correo de tu tutor");
+    const e = document.getElementById("err");
+    if (miss.length) { e.textContent = "Falta " + miss.join(", ") + "."; e.hidden = false; return; }
+    S.nombre = v("f-n"); show("done");
+  };
+}
+
+function done() {
+  const r = S.reto, first = S.nombre.split(" ")[0];
+  const items = [["Inscripción al reto", true, "", "mail"]];
+  if (!S.mayor) items.push(["Permiso de tu tutor", false, "pendiente", "shield"]);
+  items.push(["Crear tu cuenta de MIT App Inventor", false, "", "puzzle"], ["Bienvenida con " + r.mentor[0].split(" ")[0], false, "lun 12 ene · 17:00", "video"]);
+  if (S.equipo) items.push(["Invitar a tu equipo", false, "", "users"]);
+  app.innerHTML = `${nav("", null)}
+  <main>
+    <div class="doneart">${ART.medal()}</div>
+    <div class="pad" style="text-align:center;display:grid;gap:4px"><h1>Listo, ${esc(first)}</h1><p class="sub">Te mandamos un correo con los detalles.</p></div>
+    <div class="credential" aria-label="Vista previa de la microcredencial">
+      <div class="hdr"><img src="${MARK}" alt="Nexus Inventor Lab"><span>Folio NX-27-0142</span></div>
+      <div><p class="small sub">Microcredencial</p><div class="name">${esc(S.nombre)}</div></div>
+      <dl><dt>Reto</dt><dd>${esc(r.titulo)}</dd><dt>Avalada por</dt><dd>${esc(r.empresa)}</dd><dt>Duración</dt><dd>8 semanas</dd></dl>
+      <p class="stamp">${ic("award", "i sm")} Se emite al terminar el reto con 70% o más.</p>
+    </div>
+    <p class="sectionhead">Antes de empezar</p>
+    <div class="group">${items.map(([t, ok, tag, i]) => `<div class="row" style="grid-template-columns:auto 1fr auto"><span class="circle${ok ? " on" : ""}">${ok ? ic("check") : ""}</span><span style="display:flex;gap:8px;align-items:center;font-size:15px">${ic(i, "i sm")}${esc(t)}</span>${tag ? `<span class="tag">${tag}</span>` : "<span></span>"}</div>`).join("")}</div>
+  </main>
+  <div class="bottom">
+    ${ENCUESTA_URL ? `<a class="btn" href="${esc(ENCUESTA_URL)}" target="_blank" rel="noopener">Terminar y contestar la encuesta</a>` : `<p class="info">Terminaste el recorrido. Regresa a la encuesta que te compartió el equipo.</p>`}
+    <button class="btn plain" type="button" id="again">Ver otros retos</button>
+  </div>`;
+  document.getElementById("again").onclick = () => { S.reto = null; show("home"); };
+}
+
+function company() {
+  const est = [["Mariana Treviño", "CBTIS 99", 4, "probando su app", 1], ["Jorge Alanís", "CONALEP Monterrey", 4, "video listo", 0], ["Valeria Cantú", "CETIS 66", 3, "primera versión", 2], ["Iván Garza", "CBTIS 22", 2, "sin actividad en 9 días", 3]];
+  const pct = 11 / 13, R = 22, L = 2 * Math.PI * R;
+  app.innerHTML = `${nav("Patrocinador", ["home", "Retos"])}
+  <main>
+    <div class="storeart">${ART.store()}</div>
+    <div class="pad" style="display:grid;gap:4px;padding-top:14px"><h1>Abarrotes del Norte</h1>
+      <p class="sub small">Registro rápido de entregas en tienda · datos de ejemplo</p></div>
+    <div class="summary">
+      <svg class="ring" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="${R}" fill="none" stroke="#E4EAEF" stroke-width="6"/>
+        <circle cx="28" cy="28" r="${R}" fill="none" stroke="${C.cyan}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${(L * pct).toFixed(1)} ${L.toFixed(1)}" transform="rotate(-90 28 28)"/>
+        <text x="28" y="32" text-anchor="middle" font-family="-apple-system, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="${C.navy}">11/13</text></svg>
+      <span>Van en la semana 4 de 8. De 13 estudiantes inscritos, 11 siguen activos.</span>
+    </div>
+    <p class="sectionhead">${ic("users", "i sm")} Estudiantes</p>
+    <div class="group">${est.map(([n, s, w, st, f]) => `<div class="row" style="grid-template-columns:auto 1fr"><span class="face">${face(f)}</span>
+      <span><span class="t" style="font-size:15px">${n}</span><span class="d"><span>${s} ·</span><span style="${st.startsWith("sin") ? "color:#C0392B" : ""}">${st.startsWith("sin") ? ic("alert", "i sm") : ""}${st}</span></span>
+      <span class="weeks8${st.startsWith("sin") ? " warn" : ""}">${[1,2,3,4,5,6,7,8].map(k => `<i class="${k <= w ? "on" : ""}"></i>`).join("")}</span></span></div>`).join("")}</div>
+    <p class="sectionhead">${ic("award", "i sm")} Al terminar recibes</p>
+    <div class="group">
+      <div class="row" style="grid-template-columns:auto 1fr">${ic("code")}<span style="font-size:15px">Las apps de los estudiantes y su código</span></div>
+      <div class="row" style="grid-template-columns:auto 1fr">${ic("user")}<span style="font-size:15px">El portafolio de quienes destacaron</span></div>
+      <div class="row" style="grid-template-columns:auto 1fr">${ic("present")}<span style="font-size:15px">Un reporte para tu informe de responsabilidad social</span></div>
+    </div>
+  </main>
+  <div class="bottom"><button class="btn" type="button" id="newReto">${ic("plus")} Proponer otro reto</button></div>`;
+  wire();
+  document.getElementById("newReto").onclick = e => { e.currentTarget.textContent = "Aquí empezaría el formulario del reto"; };
+}
+
+show("home");
+</script>
+
+</body>
+</html>
